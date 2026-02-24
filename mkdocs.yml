@@ -1,0 +1,52 @@
+site_name: ai-breakup-recovery-agent
+repo_url: https://github.com/Paraschamoli/ai-breakup-recovery-agent
+site_url: https://Paraschamoli.github.io/ai-breakup-recovery-agent
+site_description: An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using Gemini Vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance.
+site_author: Paras Chamoli
+edit_uri: edit/main/docs/
+repo_name: Paraschamoli/ai-breakup-recovery-agent
+copyright: Maintained by <a href="https://Paraschamoli.com">Paraschamoli</a>.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["src/ai_breakup_recovery_agent"]
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Paraschamoli/ai-breakup-recovery-agent
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/ai-breakup-recovery-agent
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true

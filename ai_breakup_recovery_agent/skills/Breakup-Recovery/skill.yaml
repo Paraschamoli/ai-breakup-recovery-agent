@@ -1,0 +1,333 @@
+id: breakup-recovery-v1
+name: Breakup-Recovery
+version: 1.0.0
+author: paras25619@gmail.com
+
+# Description
+description: |
+  Provides a multi-agent system for emotional support and recovery after breakups. 
+  Coordinates four specialized AI agents:
+  - 🫂 Therapist Agent: Provides empathetic emotional support
+  - 💌 Closure Agent: Crafts unsent messages and facilitates emotional release
+  - 📅 Routine Planner Agent: Designs personalized 7-day recovery plans
+  - 🔍 Brutal Honesty Agent: Offers direct, constructive feedback with web search
+  Can analyze text and uploaded chat screenshots to provide deeper emotional insights and guidance.
+
+# Tags and Modes
+tags:
+  - breakup-recovery
+  - emotional-support
+  - therapy
+  - mental-health
+  - self-care
+  - closure
+  - healing
+  - relationship-advice
+  - wellness
+  - counseling
+  - ai-therapist
+  - recovery-planning
+
+input_modes:
+  - text/plain
+  - application/json
+  - multipart/form-data
+
+output_modes:
+  - text/plain
+  - text/markdown
+  - application/json
+
+# Example Queries
+examples:
+  - "I just went through a breakup and feel completely lost. Can you help me?"
+  - "I need to write a closure message to my ex"
+  - "Create a 7-day recovery plan for me"
+  - "Why did my relationship fail? Give honest feedback"
+  - "Analyze my last conversation from screenshots"
+  - "I'm feeling angry and sad. How do I process this?"
+
+# Detailed Capabilities
+capabilities_detail:
+  primary_capability:
+    supported: true
+    description: "Provides empathetic support and structured recovery guidance"
+    features:
+      - "Active listening and emotional validation"
+      - "Gentle humor and relatable insights"
+      - "Personalized recovery plans and self-care routines"
+      - "Image analysis for chat context"
+    limitations: "Not a replacement for professional therapy; crisis situations should be referred to experts"
+
+  secondary_capability:
+    supported: true
+    description: "Facilitates closure, emotional release, and honest feedback"
+    features:
+      - "Unsent message templates"
+      - "Letting go and closure exercises"
+      - "Brutally honest relationship feedback using web search"
+      - "Pattern recognition and growth opportunities"
+    limitations: "Feedback is based on general patterns; messages are templates"
+
+  vision_analysis:
+    supported: true
+    description: "Analyzes uploaded chat screenshots for emotional context and communication patterns"
+    features:
+      - "Text extraction from images"
+      - "Emotional tone detection"
+      - "Conversation pattern analysis"
+      - "Contextual insights"
+    limitations: "Requires clear images; may not capture entire conversation context"
+
+# Requirements
+requirements:
+  packages:
+    - "agno>=2.2.0"
+    - "google-generativeai>=0.8.0"
+    - "pillow>=10.0.0"
+    - "python-dotenv>=1.0.0"
+    - "duckduckgo-search>=7.1.0"
+    - "bindu>=2026.7.3"
+  system:
+    - "Internet connection for web search"
+  min_memory_mb: 512
+  external_services:
+    - "Google Gemini API or OpenRouter API"
+    - "DuckDuckGo Search API"
+
+# Performance Metrics
+performance:
+  avg_processing_time_ms: 5000
+  max_concurrent_requests: 5
+  memory_per_request_mb: 512
+  timeout_seconds: 120
+  scalability: horizontal
+
+# Tool Restrictions
+allowed_tools:
+  - DuckDuckGoTools
+  - Gemini Vision
+  - Read
+  - Analyze
+  - Generate
+
+# Rich Documentation
+documentation:
+  overview: |
+    A multi-agent system providing comprehensive support for individuals recovering from breakups.
+    Operates in "team mode" by coordinating four specialized agents. Combines emotional support,
+    closure message crafting, personalized recovery planning, and honest feedback with vision analysis.
+    
+  use_cases:
+    when_to_use:
+      - "Emotional distress after a breakup"
+      - "Processing unexpressed feelings"
+      - "Creating closure messages"
+      - "Structured 7-day recovery planning"
+      - "Analyzing conversation screenshots"
+      - "Seeking honest relationship feedback"
+
+    when_not_to_use:
+      - "Immediate crisis or suicidal thoughts (refer to crisis hotlines)"
+      - "Professional medical or psychiatric advice"
+      - "Legal advice about relationships"
+      - "Harmful intentions towards self or others"
+      - "Users under 18 (parental guidance recommended)"
+
+  input_structure: |
+    Accepts text, JSON options, or images:
+
+    **Simple Text:**
+    "I'm feeling really sad after my breakup"
+
+    **JSON Input:**
+    {
+      "text": "I need help moving on",
+      "mode": "therapist",  
+      "format": "simple"
+    }
+
+    **With Images:**
+    {
+      "text": "Analyze this conversation",
+      "images": [{"name": "chat1.jpg", "content": "base64_data", "type": "image/jpeg"}],
+      "mode": "team"
+    }
+
+    Modes:
+    - team (default)
+    - therapist
+    - closure
+    - routine
+    - honest
+
+    Constraints:
+    - Max text length: 5000
+    - Max images: 5
+    - Max image size: 10MB
+    - Supported formats: JPEG, PNG
+
+  output_format: |
+    Returns structured analysis with sections for emotional support, closure, recovery plan, and feedback.
+
+    Output Structure:
+    - RESPONSE: Main response text or markdown
+    - AGENT: Team or individual agent handling the request
+    - STATUS: success or error
+    - MEMBER_RESPONSES: If team mode, responses from each agent:
+      - AGENT: Agent name
+      - RESPONSE: Agent contribution
+
+  error_handling:
+    - "Missing API key: Returns instructions for obtaining keys"
+    - "Invalid mode: Defaults to team mode with notification"
+    - "Image processing failure: Continues with text-only analysis"
+    - "API rate limits: Retries with exponential backoff"
+    - "Timeout: Returns partial results with status"
+    - "Sensitive content: Provides disclaimers and resources"
+
+  examples:
+    - title: "Emotional Support Request"
+      input:
+        text: "I feel empty and don't know how to move on"
+        mode: "therapist"
+      output:
+        response: "## I hear you, and I'm here for you 🫂\nThat feeling of emptiness is normal..."
+        status: "success"
+
+    - title: "Closure Message Request"
+      input:
+        text: "Help me write a final message to my ex"
+        mode: "closure"
+      output:
+        response: "# Unsent Message Template\nDear [Name], There are things I never got to say..."
+        status: "success"
+
+    - title: "Recovery Plan Request with Images"
+      input:
+        text: "Create a recovery plan based on our last conversation"
+        images: [...]
+        mode: "routine"
+      output:
+        response: "# Your Personalized 7-Day Recovery Plan\n## Day 1: Acknowledgment..."
+        status: "success"
+
+    - title: "Honest Feedback Request"
+      input:
+        text: "Why do relationships fail? Be honest"
+        mode: "honest"
+      output:
+        response: "# Common Relationship Challenges\nBased on research, here are key factors..."
+        status: "success"
+
+  best_practices:
+    for_developers:
+      - "Provide complete emotional context for best results"
+      - "Handle image processing errors gracefully"
+      - "Use lazy initialization for performance"
+      - "Cache agent instances for efficiency"
+      - "Rate limit to prevent API abuse"
+      - "Add detailed logging"
+      - "Test with diverse emotional scenarios"
+
+    for_orchestrators:
+      - "Route emotional support queries to this skill"
+      - "Consider user's emotional state in timeouts"
+      - "Chain with crisis resources for high-risk cases"
+      - "Monitor quality and satisfaction"
+      - "Fallback to simpler support if API fails"
+      - "Ensure privacy of conversations"
+
+  installation: |
+    Required packages:
+    uv sync  # Installs dependencies from pyproject.toml
+
+    Environment variables:
+    - GOOGLE_API_KEY or GEMINI_API_KEY
+    - OPENROUTER_API_KEY
+
+    Quick start:
+    1. Clone the repo
+    2. Copy .env.example to .env and add API keys
+    3. uv venv --python 3.12
+    4. source .venv/bin/activate (Windows: .venv\Scripts\activate)
+    5. uv sync
+    6. Run agent: python -m breakup_recovery_agent.main
+
+  versioning:
+    - version: "1.0.0"
+      date: "2026-02-16"
+      changes: "Initial release with four specialized agents, vision analysis, and web search"
+    - version: "1.1.0"
+      status: "planned"
+      changes: "Add sentiment analysis, mood tracking, and progress monitoring"
+    - version: "2.0.0"
+      status: "planned"
+      changes: "Integrate professional counseling resources"
+
+# Assessment fields for skill negotiation
+assessment:
+  keywords:
+    - "breakup"
+    - "heartbreak"
+    - "ex"
+    - "relationship"
+    - "sad"
+    - "depressed"
+    - "lonely"
+    - "hurt"
+    - "pain"
+    - "healing"
+    - "recovery"
+    - "closure"
+    - "move on"
+    - "therapy"
+    - "therapist"
+    - "counseling"
+    - "mental health"
+    - "emotional support"
+    - "self-care"
+    - "journaling"
+    - "meditation"
+    - "mindfulness"
+    - "dating"
+    - "love"
+    - "lost"
+    - "crying"
+    - "broken heart"
+
+  specializations:
+    - domain: "emotional_support"
+      confidence_boost: 0.4
+    - domain: "relationship_advice"
+      confidence_boost: 0.4
+    - domain: "mental_health"
+      confidence_boost: 0.3
+    - domain: "self_improvement"
+      confidence_boost: 0.2
+
+  anti_patterns:
+    - "mathematical calculation"
+    - "code generation"
+    - "factual query without emotional context"
+    - "weather forecast"
+    - "news summary"
+    - "product recommendation"
+    - "technical support"
+
+  complexity_indicators:
+    simple:
+      - "feeling sad"
+      - "need comfort"
+      - "lonely tonight"
+      - "missing them"
+    medium:
+      - "how to move on"
+      - "closure message"
+      - "recovery plan"
+      - "what went wrong"
+    complex:
+      - "analyze our conversations"
+      - "trauma from relationship"
+      - "complicated breakup situation"
+      - "multiple failed relationships"

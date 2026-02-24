@@ -1,0 +1,174 @@
+[project]
+name = "ai-breakup-recovery-agent"
+version = "1.0.0"
+description = "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance."
+authors = [{ name = "Paras Chamoli", email = "paras25619@gmail.com" }]
+readme = "README.md"
+keywords = ["breakup-recovery", "emotional-support", "mental-health", "ai-agents", "therapy", "self-care"]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "bindu==2026.9.2.2",
+    "agno>=2.2.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.8.0",
+    "pillow>=10.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "rich>=13.0.0",
+    "duckduckgo-search>=7.1.0",
+    "ddgs>=9.9.3",  # Updated to match research-agent version
+    "mem0ai>=1.0.1",  # Added for memory features
+    "newspaper4k>=0.1.1",  # Added for article parsing
+    "lxml_html_clean>=0.1.0",  # Added for newspaper4k
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Development Status :: 4 - Beta",
+]
+
+[project.urls]
+Homepage = "https://paraschamoli.github.io/ai-breakup-recovery-agent/"
+Repository = "https://github.com/Paraschamoli/ai-breakup-recovery-agent"
+Documentation = "https://paraschamoli.github.io/ai-breakup-recovery-agent/"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.2.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.0.0",
+    "pre-commit>=2.20.0",
+    "ruff>=0.11.5",
+    "mypy>=1.0.0",
+    "types-requests>=2.31.0",
+    "tox-uv>=1.11.3",  # Added to match research-agent
+    "ty>=0.0.1a16",  # Updated to match research-agent
+    "mkdocs>=1.4.2",  # Added for documentation
+    "mkdocs-material>=8.5.10",  # Added for documentation
+    "mkdocstrings[python]>=0.26.1",  # Added for documentation
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ai_breakup_recovery_agent"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "ai_breakup_recovery_agent/**/*.py",
+    "README.md",
+    "LICENSE",
+    "agent_config.json",
+]
+
+[tool.ty.environment]
+python = "./.venv"
+python-version = "3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-v --cov=ai_breakup_recovery_agent --cov-report=term-missing"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+fix = true
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-bandit - Added for security
+    "S",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger - Added
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # flake8-2020
+    "YTT",
+    # flake8-pytest-style - Added
+    "PT",
+    # mccabe - Added for complexity
+    "C90",
+    # pygrep-hooks - Added
+    "PGH",
+    # tryceratops - Added for error handling
+    "TRY",
+    # ruff
+    "RUF",
+]
+ignore = [
+    "E501",  # Line too long
+    "E731",  # Do not assign a lambda expression, use a def
+    "B008",  # Do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "TRY"]
+
+
+[tool.ruff.lint.isort]
+known-first-party = ["ai_breakup_recovery_agent"]
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+strict_optional = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+
+[tool.coverage.report]
+skip_empty = true
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["ai_breakup_recovery_agent"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.paths]
+source = ["ai_breakup_recovery_agent"]
