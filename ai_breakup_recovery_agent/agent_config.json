@@ -1,13 +1,13 @@
 {
-    "author": "paras25619@gmail.com",
-    "name": "ai-breakup-recovery-agent",
-    "description": "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance.",
-    "version": "1.0.0",
-    "recreate_keys": false,
-    "skills": [
-        "skills/breakup-recovery"
-    ],
-     "capabilities": {},
+  "author": "paras25619@gmail.com",
+  "name": "ai-breakup-recovery-agent",
+  "description": "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents\u2014including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor\u2014each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance.",
+  "version": "1.0.0",
+  "recreate_keys": false,
+  "skills": [
+    "skills/breakup-recovery"
+  ],
+  "capabilities": {},
   "agent_trust": "low",
   "debug_mode": true,
   "debug_level": 2,
@@ -23,21 +23,21 @@
     ]
   },
   "num_history_sessions": 5,
-    "environment_variables": [
-        {
-            "key": "GEMINI_API_KEY",
-            "description": "Google Gemini API key for LLM calls and vision analysis (preferred)",
-            "required": false
-        },
-        {
-            "key": "OPENROUTER_API_KEY",
-            "description": "OpenRouter API key for LLM calls (fallback option)",
-            "required": false
-        },
-        {
-            "key": "MEM0_API_KEY",
-            "description": "Mem0 API key for memory operations across sessions",
-            "required": false
-        }
-    ]
+  "environment_variables": [
+    {
+      "key": "GEMINI_API_KEY",
+      "description": "Google Gemini API key for LLM calls and vision analysis (preferred)",
+      "required": false
+    },
+    {
+      "key": "OPENROUTER_API_KEY",
+      "description": "OpenRouter API key for LLM calls (fallback option)",
+      "required": false
+    },
+    {
+      "key": "MEM0_API_KEY",
+      "description": "Mem0 API key for memory operations across sessions",
+      "required": false
+    }
+  ]
 }

@@ -15,6 +15,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     "rich>=13.0.0",
+      "google-genai>=0.2.0",
     "duckduckgo-search>=7.1.0",
     "ddgs>=9.9.3",  # Updated to match research-agent version
     "mem0ai>=1.0.1",  # Added for memory features

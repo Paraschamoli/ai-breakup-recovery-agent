@@ -15,13 +15,14 @@ agents: emotional support, closure messages, recovery planning, and honest feedb
 
 import argparse
 import asyncio
+import contextlib
 import json
 import os
 import sys
 import tempfile
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from agno.agent import Agent
 from agno.media import Image as AgnoImage
@@ -37,20 +38,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Global instances
-therapist_agent: Optional[Agent] = None
-closure_agent: Optional[Agent] = None
-routine_planner_agent: Optional[Agent] = None
-brutal_honesty_agent: Optional[Agent] = None
-recovery_team: Optional[Team] = None
+therapist_agent: Agent | None = None
+closure_agent: Agent | None = None
+routine_planner_agent: Agent | None = None
+brutal_honesty_agent: Agent | None = None
+recovery_team: Team | None = None
 
-model_name: Optional[str] = None
-api_key: Optional[str] = None
-mem0_api_key: Optional[str] = None
+model_name: str | None = None
+api_key: str | None = None
+mem0_api_key: str | None = None
 _initialized = False
 _init_lock = asyncio.Lock()
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load agent configuration from project root."""
     # Try multiple possible locations for agent_config.json
     possible_paths = [
@@ -183,7 +184,7 @@ async def initialize_agents() -> None:
         tools = [DuckDuckGoTools()]
         if mem0_tools:
             tools.append(mem0_tools)
-            
+
         brutal_honesty_agent = Agent(
             name="Brutal Honesty Agent",
             model=model,
@@ -238,7 +239,7 @@ async def initialize_agents() -> None:
         raise
 
 
-async def process_images(uploaded_files: Optional[List[Dict[str, Any]]] = None) -> List[AgnoImage]:
+async def process_images(uploaded_files: list[dict[str, Any]] | None = None) -> list[AgnoImage]:
     """Process uploaded images into AgnoImage format.
 
     Args:
@@ -247,56 +248,50 @@ async def process_images(uploaded_files: Optional[List[Dict[str, Any]]] = None) 
     Returns:
         List of AgnoImage objects
     """
-    processed_images = []
-    
     if not uploaded_files:
-        return processed_images
-    
+        return []
+
     temp_files = []  # Track temp files for cleanup
-    
+    processed_images = []
+
     try:
         for file in uploaded_files:
             try:
                 # Create a temporary file
-                with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file['name']).suffix) as tmp_file:
-                    tmp_file.write(file['content'])
+                with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file["name"]).suffix) as tmp_file:
+                    tmp_file.write(file["content"])
                     tmp_path = tmp_file.name
                     temp_files.append(tmp_path)
-                
+
                 # Create AgnoImage from the temporary file
                 agno_image = AgnoImage(filepath=Path(tmp_path))
                 processed_images.append(agno_image)
-                
+
             except Exception as e:
                 print(f"⚠️  Error processing image {file.get('name', 'unknown')}: {e}")
                 # Clean up this temp file if it was created
-                if 'tmp_path' in locals():
-                    try:
+                if "tmp_path" in locals():
+                    with contextlib.suppress(Exception):
                         Path(tmp_path).unlink(missing_ok=True)
-                    except Exception:
-                        pass
                 continue
-        
-        return processed_images
-        
-    except Exception as e:
+    except Exception:
         # Clean up all temp files on error
         for temp_file in temp_files:
-            try:
+            with contextlib.suppress(Exception):
                 Path(temp_file).unlink(missing_ok=True)
-            except Exception:
-                pass
         raise
+    else:
+        return processed_images
 
 
-async def run_therapist_agent(user_input: str, images: Optional[List[AgnoImage]] = None) -> str:
+async def run_therapist_agent(user_input: str, images: list[AgnoImage] | None = None) -> str:
     """Run the therapist agent for emotional support."""
     global therapist_agent
-    
+
     if not therapist_agent:
         error_msg = "Therapist agent not initialized"
         raise RuntimeError(error_msg)
-    
+
     prompt = f"""Provide emotional support based on:
 
 User's message: {user_input}
@@ -309,19 +304,19 @@ Please provide a compassionate response with:
 5. Gentle humor if appropriate to lighten the mood
 
 Remember to be warm, empathetic, and genuinely supportive."""
-    
+
     response = therapist_agent.run(prompt, images=images)
     return response.content if response.content else ""
 
 
-async def run_closure_agent(user_input: str, images: Optional[List[AgnoImage]] = None) -> str:
+async def run_closure_agent(user_input: str, images: list[AgnoImage] | None = None) -> str:
     """Run the closure agent for unsent messages and emotional release."""
     global closure_agent
-    
+
     if not closure_agent:
         error_msg = "Closure agent not initialized"
         raise RuntimeError(error_msg)
-    
+
     prompt = f"""Help create emotional closure based on:
 
 User's feelings: {user_input}
@@ -334,19 +329,19 @@ Please provide:
 5. Ways to honor the relationship and its lessons
 
 Format messages clearly and ensure the tone is heartfelt and authentic."""
-    
+
     response = closure_agent.run(prompt, images=images)
     return response.content if response.content else ""
 
 
-async def run_routine_planner_agent(user_input: str, images: Optional[List[AgnoImage]] = None) -> str:
+async def run_routine_planner_agent(user_input: str, images: list[AgnoImage] | None = None) -> str:
     """Run the routine planner agent for recovery planning."""
     global routine_planner_agent
-    
+
     if not routine_planner_agent:
         error_msg = "Routine planner agent not initialized"
         raise RuntimeError(error_msg)
-    
+
     prompt = f"""Design a personalized 7-day recovery plan based on:
 
 Current emotional state: {user_input}
@@ -361,19 +356,19 @@ Include:
 7. Journaling prompts for reflection
 
 Make the plan practical, actionable, and tailored to their situation."""
-    
+
     response = routine_planner_agent.run(prompt, images=images)
     return response.content if response.content else ""
 
 
-async def run_brutal_honesty_agent(user_input: str, images: Optional[List[AgnoImage]] = None) -> str:
+async def run_brutal_honesty_agent(user_input: str, images: list[AgnoImage] | None = None) -> str:
     """Run the brutal honesty agent for direct feedback."""
     global brutal_honesty_agent
-    
+
     if not brutal_honesty_agent:
         error_msg = "Brutal honesty agent not initialized"
         raise RuntimeError(error_msg)
-    
+
     prompt = f"""Provide honest, constructive feedback about:
 
 Situation: {user_input}
@@ -387,19 +382,19 @@ Include:
 6. Search for relevant articles or expert perspectives if helpful
 
 Be direct and honest, but maintain compassion. Focus on clarity and growth."""
-    
+
     response = brutal_honesty_agent.run(prompt, images=images)
     return response.content if response.content else ""
 
 
-async def run_recovery_team(user_input: str, images: Optional[List[AgnoImage]] = None) -> Dict[str, Any]:
+async def run_recovery_team(user_input: str, images: list[AgnoImage] | None = None) -> dict[str, Any]:
     """Run the entire recovery team for comprehensive support."""
     global recovery_team
-    
+
     if not recovery_team:
         error_msg = "Recovery team not initialized"
         raise RuntimeError(error_msg)
-    
+
     prompt = f"""Coordinate the Breakup Recovery Squad to help with:
 
 User's situation: {user_input}
@@ -407,54 +402,64 @@ User's situation: {user_input}
 Please analyze their needs and have the appropriate agents respond.
 If multiple types of support are needed, coordinate responses from multiple agents.
 Ensure the responses are comprehensive, non-repetitive, and truly helpful."""
-    
+
     response = recovery_team.run(prompt, images=images)
-    
+
     return {
-        "coordinator_response": response.content if hasattr(response, 'content') else str(response),
-        "member_responses": getattr(response, 'member_responses', []),
+        "coordinator_response": response.content if hasattr(response, "content") else str(response),
+        "member_responses": getattr(response, "member_responses", []),
     }
 
 
-async def handler(messages: List[Dict[str, str]]) -> str:
+def _extract_message_data(messages: list[dict[str, str]]) -> tuple[str, list, str]:
+    """Extract user input, images data, and mode from messages."""
+    images_data = []
+    mode = "team"
+    user_input = ""
+
+    if not messages:
+        return user_input, images_data, mode
+
+    last_message = messages[-1]
+    if last_message.get("role") != "user":
+        return user_input, images_data, mode
+
+    content = last_message.get("content", "")
+
+    # Check if content is JSON with special parameters
+    if content.startswith("{") and content.endswith("}"):
+        try:
+            parsed = json.loads(content)
+            if isinstance(parsed, dict):
+                user_input = parsed.get("text", "")
+                images_data = parsed.get("images", [])
+                mode = parsed.get("mode", "team")
+        except json.JSONDecodeError:
+            user_input = content
+    else:
+        user_input = content
+
+    return user_input, images_data, mode
+
+
+async def handler(messages: list[dict[str, str]]) -> str:
     """Handle incoming agent messages with lazy initialization.
-    
+
     Args:
         messages: List of message dictionaries with 'role' and 'content' keys
                  Format expected by Bindu: [{"role": "user", "content": "user message"}]
-    
+
     Returns:
         Response string for UI display
     """
     global _initialized
-    
+
     # Extract data from messages
-    images_data = []
-    mode = "team"
-    user_input = ""
-    
-    if messages and len(messages) > 0:
-        last_message = messages[-1]
-        if last_message.get("role") == "user":
-            content = last_message.get("content", "")
-            
-            # Check if content is JSON with special parameters
-            if content.startswith("{") and content.endswith("}"):
-                try:
-                    parsed = json.loads(content)
-                    if isinstance(parsed, dict):
-                        user_input = parsed.get("text", "")
-                        images_data = parsed.get("images", [])
-                        mode = parsed.get("mode", "team")
-                except json.JSONDecodeError:
-                    # Not JSON, use content as is
-                    user_input = content
-            else:
-                user_input = content
-    
+    user_input, images_data, mode = _extract_message_data(messages)
+
     if not user_input:
         return "No valid user message found"
-    
+
     # Lazy initialization on first call
     async with _init_lock:
         if not _initialized:
@@ -467,24 +472,25 @@ async def handler(messages: List[Dict[str, str]]) -> str:
                 error_msg = f"Failed to initialize agents: {e}"
                 print(f"❌ {error_msg}")
                 return f"Error: {error_msg}"
-    
+
     try:
         # Process images if any
         images = await process_images(images_data) if images_data else []
-        
+
         # Run the appropriate agent based on mode
         if mode == "therapist":
             return await run_therapist_agent(user_input, images)
-        elif mode == "closure":
+        if mode == "closure":
             return await run_closure_agent(user_input, images)
-        elif mode == "routine":
+        if mode == "routine":
             return await run_routine_planner_agent(user_input, images)
-        elif mode == "honest":
+        if mode == "honest":
             return await run_brutal_honesty_agent(user_input, images)
-        else:  # team mode (default)
-            team_response = await run_recovery_team(user_input, images)
-            return team_response["coordinator_response"]
-            
+
+        # team mode (default)
+        team_response = await run_recovery_team(user_input, images)
+        return team_response["coordinator_response"]
+
     except Exception as e:
         print(f"❌ Error in handler: {e}")
         traceback.print_exc()
@@ -568,12 +574,12 @@ def main():
     try:
         # Start the agent server
         print("🚀 Starting Breakup Recovery Squad server...")
-        server_url = config.get('deployment', {}).get('url', 'http://127.0.0.1:3773')
+        server_url = config.get("deployment", {}).get("url", "http://127.0.0.1:3773")
         print(f"🌐 Server will run on: {server_url}")
         print("⏳ Agents will initialize on first request\n")
-        
+
         bindufy(config, handler)
-        
+
     except KeyboardInterrupt:
         print("\n🛑 Breakup Recovery Squad stopped by user")
     except Exception as e:

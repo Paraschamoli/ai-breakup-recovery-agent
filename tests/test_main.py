@@ -18,7 +18,11 @@ async def test_handler_returns_response():
     # Mock _initialized to skip initialization and run_recovery_team to return our mock
     with (
         patch("ai_breakup_recovery_agent.main._initialized", True),
-        patch("ai_breakup_recovery_agent.main.run_recovery_team", new_callable=AsyncMock, return_value={"coordinator_response": mock_response}),
+        patch(
+            "ai_breakup_recovery_agent.main.run_recovery_team",
+            new_callable=AsyncMock,
+            return_value={"coordinator_response": mock_response},
+        ),
     ):
         result = await handler(messages)
 
@@ -40,7 +44,11 @@ async def test_handler_with_multiple_messages():
 
     with (
         patch("ai_breakup_recovery_agent.main._initialized", True),
-        patch("ai_breakup_recovery_agent.main.run_recovery_team", new_callable=AsyncMock, return_value={"coordinator_response": mock_response}) as mock_run,
+        patch(
+            "ai_breakup_recovery_agent.main.run_recovery_team",
+            new_callable=AsyncMock,
+            return_value={"coordinator_response": mock_response},
+        ) as mock_run,
     ):
         result = await handler(messages)
 
@@ -61,7 +69,11 @@ async def test_handler_initialization():
     with (
         patch("ai_breakup_recovery_agent.main._initialized", False),
         patch("ai_breakup_recovery_agent.main.initialize_agents", new_callable=AsyncMock) as mock_init,
-        patch("ai_breakup_recovery_agent.main.run_recovery_team", new_callable=AsyncMock, return_value={"coordinator_response": mock_response}) as mock_run,
+        patch(
+            "ai_breakup_recovery_agent.main.run_recovery_team",
+            new_callable=AsyncMock,
+            return_value={"coordinator_response": mock_response},
+        ) as mock_run,
         patch("ai_breakup_recovery_agent.main._init_lock", new_callable=MagicMock) as mock_lock,
     ):
         # Configure the lock to work as an async context manager
@@ -91,7 +103,11 @@ async def test_handler_race_condition_prevention():
     with (
         patch("ai_breakup_recovery_agent.main._initialized", False),
         patch("ai_breakup_recovery_agent.main.initialize_agents", new_callable=AsyncMock) as mock_init,
-        patch("ai_breakup_recovery_agent.main.run_recovery_team", new_callable=AsyncMock, return_value={"coordinator_response": mock_response}),
+        patch(
+            "ai_breakup_recovery_agent.main.run_recovery_team",
+            new_callable=AsyncMock,
+            return_value={"coordinator_response": mock_response},
+        ),
         patch("ai_breakup_recovery_agent.main._init_lock", new_callable=MagicMock) as mock_lock,
     ):
         # Configure the lock to work as an async context manager
@@ -119,15 +135,16 @@ async def test_handler_with_different_modes():
         "honest": "run_brutal_honesty_agent",
         "team": "run_recovery_team",
     }
-    
+
     for mode in modes:
         # Create JSON message with mode
         import json
+
         content = json.dumps({"text": "I need help", "mode": mode})
         messages = [{"role": "user", "content": content}]
-        
+
         mock_response = f"Response from {mode} agent"
-        
+
         with (
             patch("ai_breakup_recovery_agent.main._initialized", True),
             patch(f"ai_breakup_recovery_agent.main.{agent_functions[mode]}", new_callable=AsyncMock) as mock_run,
@@ -136,9 +153,9 @@ async def test_handler_with_different_modes():
                 mock_run.return_value = {"coordinator_response": mock_response}
             else:
                 mock_run.return_value = mock_response
-            
+
             result = await handler(messages)
-            
+
             assert result == mock_response
 
 
@@ -146,15 +163,19 @@ async def test_handler_with_different_modes():
 async def test_handler_simple_format():
     """Test handler with simple (non-JSON) format."""
     messages = [{"role": "user", "content": "I need help"}]
-    
+
     mock_response = "Simple response"
-    
+
     with (
         patch("ai_breakup_recovery_agent.main._initialized", True),
-        patch("ai_breakup_recovery_agent.main.run_recovery_team", new_callable=AsyncMock, return_value={"coordinator_response": mock_response}),
+        patch(
+            "ai_breakup_recovery_agent.main.run_recovery_team",
+            new_callable=AsyncMock,
+            return_value={"coordinator_response": mock_response},
+        ),
     ):
         result = await handler(messages)
-        
+
         assert result == mock_response
 
 
@@ -170,7 +191,7 @@ async def test_handler_with_no_messages():
 async def test_handler_with_no_user_message():
     """Test that handler handles missing user message."""
     messages = [{"role": "system", "content": "System message"}]
-    
+
     with patch("ai_breakup_recovery_agent.main._initialized", True):
         result = await handler(messages)
         assert result == "No valid user message found"
@@ -180,7 +201,7 @@ async def test_handler_with_no_user_message():
 async def test_handler_initialization_failure():
     """Test that handler handles initialization failure gracefully."""
     messages = [{"role": "user", "content": "Test"}]
-    
+
     with (
         patch("ai_breakup_recovery_agent.main._initialized", False),
         patch("ai_breakup_recovery_agent.main.initialize_agents", new_callable=AsyncMock) as mock_init,
@@ -189,7 +210,7 @@ async def test_handler_initialization_failure():
         mock_init.side_effect = Exception("API key invalid")
         mock_lock.__aenter__ = AsyncMock()
         mock_lock.__aexit__ = AsyncMock()
-        
+
         result = await handler(messages)
-        
+
         assert "Failed to initialize agents" in result

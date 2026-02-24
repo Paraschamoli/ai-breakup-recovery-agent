@@ -5,7 +5,7 @@ author: paras25619@gmail.com
 
 # Description
 description: |
-  Provides a multi-agent system for emotional support and recovery after breakups. 
+  Provides a multi-agent system for emotional support and recovery after breakups.
   Coordinates four specialized AI agents:
   - 🫂 Therapist Agent: Provides empathetic emotional support
   - 💌 Closure Agent: Crafts unsent messages and facilitates emotional release
@@ -117,7 +117,7 @@ documentation:
     A multi-agent system providing comprehensive support for individuals recovering from breakups.
     Operates in "team mode" by coordinating four specialized agents. Combines emotional support,
     closure message crafting, personalized recovery planning, and honest feedback with vision analysis.
-    
+
   use_cases:
     when_to_use:
       - "Emotional distress after a breakup"
@@ -143,7 +143,7 @@ documentation:
     **JSON Input:**
     {
       "text": "I need help moving on",
-      "mode": "therapist",  
+      "mode": "therapist",
       "format": "simple"
     }
 
