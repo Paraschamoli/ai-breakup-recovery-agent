@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Paraschamoli/ai-breakup-recovery-agent/actions/workflows/main.yml?query=branch%3Amain">
-    <img src="https://img.shields.io/github/actions/workflow/status/Paraschamoli/ai-breakup-recovery-agent/main.yml?branch=main" alt="Build status">
+  <a href="https://github.com/Paraschamoli/ai-breakup-recovery-agent/actions/workflows/build-and-push.yml?query=branch%3Amain">
+    <img src="https://img.shields.io/github/actions/workflow/status/Paraschamoli/ai-breakup-recovery-agent/build-and-push.yml?branch=main" alt="Build status">
   </a>
   <a href="https://img.shields.io/github/license/Paraschamoli/ai-breakup-recovery-agent">
     <img src="https://img.shields.io/github/license/Paraschamoli/ai-breakup-recovery-agent" alt="License">
@@ -21,14 +21,14 @@
 
 ## 📖 Overview
 
-An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using Gemini Vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance.. Built on the [Bindu Agent Framework](https://github.com/getbindu/bindu) for the Internet of Agents.
+An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using Gemini Vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance. Built on the [Bindu Agent Framework](https://github.com/getbindu/bindu) for the Internet of Agents.
 
 **Key Capabilities:**
 - 🧠 **Therapeutic Support** - Professional emotional guidance and coping strategies
 - ✍️ **Closure Writing** - Help with closure letters and emotional expression
 - 📅 **Routine Planning** - Structured daily routines for recovery and growth
 - 💬 **Honest Advice** - Direct feedback and reality checks for personal growth
-- � **Chat Analysis** - Analyze conversation screenshots for deeper insights
+- 📸 **Chat Analysis** - Analyze conversation screenshots for deeper insights
 
 ---
 
@@ -64,7 +64,7 @@ Edit `.env` and add your API keys:
 
 | Key | Get It From | Required |
 |-----|-------------|----------|
-| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/keys) | ✅ Yes |
+| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/keys) | Yes |
 | `MEM0_API_KEY` | [Mem0 Dashboard](https://app.mem0.ai/dashboard/api-keys) | If you want to use Mem0 tools |
 
 ### Run the Agent
@@ -271,7 +271,7 @@ GitHub Actions will automatically:
 ai-breakup-recovery-agent/
 ├── ai_breakup_recovery_agent/
 │   ├── skills/
-│   │   └── ai_breakup_recovery_agent/
+│   │   └── Breakup-Recovery/
 │   │       ├── skill.yaml          # Skill configuration
 │   │       └── __init__.py
 │   ├── __init__.py
@@ -370,5 +370,6 @@ uvx cookiecutter https://github.com/getbindu/create-bindu-agent.git
   <a href="https://bindus.directory">🌐 Agent Directory</a>
 </p>
 
-#   a i - b r e a k u p - r e c o v e r y - a g e n t  
+#   a i - b r e a k u p - r e c o v e r y - a g e n t 
+ 
  
