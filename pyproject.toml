@@ -2,12 +2,12 @@
 name = "ai-breakup-recovery-agent"
 version = "1.0.0"
 description = "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents—including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor—each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance."
-authors = [{ name = "Paras Chamoli", email = "paras25619@gmail.com" }]
+authors = [{ name = "Paras Chamoli", email = "paras@getbindu.com" }]
 readme = "README.md"
 keywords = ["breakup-recovery", "emotional-support", "mental-health", "ai-agents", "therapy", "self-care"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "bindu==2026.9.2.2",
+    "bindu==2026.9.4",
     "agno>=2.2.0",
     "openai>=1.0.0",
     "google-generativeai>=0.8.0",
@@ -15,12 +15,12 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     "rich>=13.0.0",
-      "google-genai>=0.2.0",
     "duckduckgo-search>=7.1.0",
-    "ddgs>=9.9.3",  # Updated to match research-agent version
-    "mem0ai>=1.0.1",  # Added for memory features
-    "newspaper4k>=0.1.1",  # Added for article parsing
-    "lxml_html_clean>=0.1.0",  # Added for newspaper4k
+    "ddgs>=9.9.3",
+    "mem0ai>=1.0.1",
+    "newspaper4k>=0.1.1",
+    "lxml_html_clean>=0.1.0",
+    "google-genai>=1.65.0",
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -47,11 +47,11 @@ dev = [
     "ruff>=0.11.5",
     "mypy>=1.0.0",
     "types-requests>=2.31.0",
-    "tox-uv>=1.11.3",  # Added to match research-agent
-    "ty>=0.0.1a16",  # Updated to match research-agent
-    "mkdocs>=1.4.2",  # Added for documentation
-    "mkdocs-material>=8.5.10",  # Added for documentation
-    "mkdocstrings[python]>=0.26.1",  # Added for documentation
+    "tox-uv>=1.11.3",
+    "ty>=0.0.1a16",
+    "mkdocs>=1.4.2",
+    "mkdocs-material>=8.5.10",
+    "mkdocstrings[python]>=0.26.1",
 ]
 
 [build-system]
@@ -99,25 +99,25 @@ select = [
     "UP",
     # flake8-bugbear
     "B",
-    # flake8-bandit - Added for security
+    # flake8-bandit
     "S",
     # flake8-builtins
     "A",
     # flake8-comprehensions
     "C4",
-    # flake8-debugger - Added
+    # flake8-debugger
     "T10",
     # flake8-simplify
     "SIM",
     # flake8-2020
     "YTT",
-    # flake8-pytest-style - Added
+    # flake8-pytest-style
     "PT",
-    # mccabe - Added for complexity
+    # mccabe
     "C90",
-    # pygrep-hooks - Added
+    # pygrep-hooks
     "PGH",
-    # tryceratops - Added for error handling
+    # tryceratops
     "TRY",
     # ruff
     "RUF",
@@ -130,7 +130,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PLR2004", "TRY"]
-
 
 [tool.ruff.lint.isort]
 known-first-party = ["ai_breakup_recovery_agent"]

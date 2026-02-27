@@ -1,7 +1,7 @@
 {
-  "author": "paras25619@gmail.com",
+  "author": "paras@getbindu.com",
   "name": "ai-breakup-recovery-agent",
-  "description": "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents\u2014including a Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor\u2014each providing a unique perspective and form of guidance. The system can also analyze uploaded chat screenshots using vision capabilities to offer deeper emotional insights. By combining empathetic support, structured routines, emotional catharsis, and direct feedback, the agent team delivers comprehensive, personalized recovery assistance.",
+  "description": "An AI-powered multi-agent system designed to support users through emotional recovery after a breakup. The team consists of specialized agents\u2014Therapist, Closure Writer, Routine Planner, and Brutal Honesty Advisor. The system utilizes vision capabilities to analyze chat screenshots for deeper emotional insights.",
   "version": "1.0.0",
   "recreate_keys": false,
   "skills": [
@@ -26,18 +26,18 @@
   "environment_variables": [
     {
       "key": "GEMINI_API_KEY",
-      "description": "Google Gemini API key for LLM calls and vision analysis (preferred)",
+      "description": "Google Gemini API key for LLM calls and vision analysis",
       "required": false
     },
     {
       "key": "OPENROUTER_API_KEY",
-      "description": "OpenRouter API key for LLM calls (fallback option)",
-      "required": false
+      "description": "OpenRouter API key for text-only fallback",
+      "required": true
     },
     {
       "key": "MEM0_API_KEY",
-      "description": "Mem0 API key for memory operations across sessions",
-      "required": false
+      "description": "Mem0 API key for memory operations",
+      "required": true
     }
   ]
 }
