@@ -85,10 +85,13 @@ jobs:
       - name: Prepare registration payload
         id: prepare_payload
         run: |
+          echo '${{ steps.agent_config.outputs.config }}' > agent_config.json
+          echo '${{ steps.agent_config.outputs.skill }}' > skill.json
+
           # Create registration payload using jq
           REGISTRATION_PAYLOAD=$(jq -n \
-            --argjson agent_config '${{ steps.agent_config.outputs.config }}' \
-            --argjson skill '${{ steps.agent_config.outputs.skill }}' \
+            --slurpfile agent_config agent_config.json \
+            --slurpfile skill skill.json \
             --arg version '${{ steps.version.outputs.version }}' \
             --arg docker_image "${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:latest" \
             --arg docker_digest "${{ steps.docker_build.outputs.digest }}" \
@@ -98,25 +101,25 @@ jobs:
             --arg last_updated "${{ github.event.head_commit.timestamp }}" \
             '{
               "agent": {
-                "name": $agent_config.name,
-                "author": $agent_config.author,
-                "description": $agent_config.description,
+                "name": $agent_config[0].name,
+                "author": $agent_config[0].author,
+                "description": $agent_config[0].description,
                 "version": $version,
-                "agent_trust": $agent_config.agent_trust,
+                "agent_trust": $agent_config[0].agent_trust,
                 "type": "emotional-support"
               },
-              "skills": [$skill],
+              "skills": [$skill[0]],
               "framework": {
                 "name": "agno",
                 "version": "1.0.0"
               },
-              "capabilities": $agent_config.capabilities,
-              "environment_variables": $agent_config.environment_variables,
+              "capabilities": $agent_config[0].capabilities,
+              "environment_variables": $agent_config[0].environment_variables,
               "execution_cost": {},
               "auth": {},
               "deployment": {
-                "url": $agent_config.deployment.url,
-                "protocol_version": $agent_config.deployment.protocol_version,
+                "url": $agent_config[0].deployment.url,
+                "protocol_version": $agent_config[0].deployment.protocol_version,
                 "docker_image": $docker_image,
                 "docker_digest": $docker_digest,
                 "platforms": ["linux/amd64", "linux/arm64"]
