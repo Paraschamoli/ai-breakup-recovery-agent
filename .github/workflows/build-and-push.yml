@@ -5,12 +5,11 @@ on:
     branches:
       - main
     paths:
-      - 'Dockerfile.agent'
-      - 'ai_breakup_recovery_agent/**'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - 'agent_config.json'
-      - '.github/workflows/build-and-push.yml'
+      - "Dockerfile.agent"
+      - "ai_breakup_recovery_agent/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/build-and-push.yml"
   workflow_dispatch:
 
 concurrency:
@@ -20,16 +19,12 @@ concurrency:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Install yq
-        run: |
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod a+x /usr/local/bin/yq
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -37,7 +32,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Read version from pyproject.toml
+      - name: Read version
         id: version
         run: |
           VERSION=$(grep '^version = ' pyproject.toml | sed "s/version = \"\(.*\)\"/\1/" | tr -d '\n')
@@ -60,39 +55,37 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:buildcache,mode=max
 
-      - name: Read agent config
-        id: agent_config
+      - name: Install dependencies
         run: |
-          # Read agent config using heredoc to handle multi-line JSON
-          echo 'config<<EOF' >> $GITHUB_OUTPUT
-          cat ai_breakup_recovery_agent/agent_config.json >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod a+x /usr/local/bin/yq
 
-          # Read skill if exists
+      - name: Prepare Bindu registration data
+        id: prepare_data
+        run: |
+          # Read agent config
+          AGENT_CONFIG=$(cat ai_breakup_recovery_agent/agent_config.json)
+
+          # Read skill.yaml and convert to JSON
           SKILL_PATH="ai_breakup_recovery_agent/skills/Breakup-Recovery/skill.yaml"
           if [ -f "$SKILL_PATH" ]; then
             echo "Reading skill from: $SKILL_PATH"
-            SKILL_JSON=$(yq -o=json "$SKILL_PATH" | jq '.requirements = (.requirements.packages // [])')
-            echo 'skill<<EOF' >> $GITHUB_OUTPUT
-            echo "$SKILL_JSON" >> $GITHUB_OUTPUT
-            echo 'EOF' >> $GITHUB_OUTPUT
+            SKILL_JSON=$(yq -o=json "$SKILL_PATH")
           else
-            echo 'skill<<EOF' >> $GITHUB_OUTPUT
-            echo "{}" >> $GITHUB_OUTPUT
-            echo 'EOF' >> $GITHUB_OUTPUT
+            echo "Error: Skill file not found at $SKILL_PATH"
+            SKILL_JSON="{}"
           fi
 
-      - name: Prepare registration payload
-        id: prepare_payload
-        run: |
-          echo '${{ steps.agent_config.outputs.config }}' > agent_config.json
-          echo '${{ steps.agent_config.outputs.skill }}' > skill.json
+          # Get version again
+          VERSION=$(grep '^version = ' pyproject.toml | sed "s/version = \"\(.*\)\"/\1/" | tr -d '\n')
 
-          # Create registration payload using jq
+          # Build registration payload
           REGISTRATION_PAYLOAD=$(jq -n \
-            --slurpfile agent_config agent_config.json \
-            --slurpfile skill skill.json \
-            --arg version '${{ steps.version.outputs.version }}' \
+            --argjson agent_config "$AGENT_CONFIG" \
+            --argjson skill "$SKILL_JSON" \
+            --arg version "$VERSION" \
             --arg docker_image "${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:latest" \
             --arg docker_digest "${{ steps.docker_build.outputs.digest }}" \
             --arg repo_url "https://github.com/${{ github.repository }}" \
@@ -101,25 +94,24 @@ jobs:
             --arg last_updated "${{ github.event.head_commit.timestamp }}" \
             '{
               "agent": {
-                "name": $agent_config[0].name,
-                "author": $agent_config[0].author,
-                "description": $agent_config[0].description,
+                "name": $agent_config.name,
+                "author": $agent_config.author,
+                "description": $agent_config.description,
                 "version": $version,
-                "agent_trust": $agent_config[0].agent_trust,
+                "agent_trust": $agent_config.agent_trust,
                 "type": "emotional-support"
               },
-              "skills": [$skill[0]],
+              "skills": [$skill],
               "framework": {
                 "name": "agno",
                 "version": "1.0.0"
               },
-              "capabilities": $agent_config[0].capabilities,
-              "environment_variables": $agent_config[0].environment_variables,
+              "environment_variables": $agent_config.environment_variables,
               "execution_cost": {},
               "auth": {},
               "deployment": {
-                "url": $agent_config[0].deployment.url,
-                "protocol_version": $agent_config[0].deployment.protocol_version,
+                "url": $agent_config.deployment.url,
+                "protocol_version": $agent_config.deployment.protocol_version,
                 "docker_image": $docker_image,
                 "docker_digest": $docker_digest,
                 "platforms": ["linux/amd64", "linux/arm64"]
@@ -130,81 +122,29 @@ jobs:
                 "build_number": $build_number
               },
               "metadata": {
-                "documentation_url": "https://paraschamoli.github.io/ai-breakup-recovery-agent/",
+                "documentation_url": "https://github.com/${{ github.repository }}#readme",
                 "domain": "wellness",
                 "specialization": "emotional-support",
-                "agent_count": 4,
-                "capabilities": ["emotional-support", "closure-writing", "recovery-planning", "direct-feedback", "vision-analysis"],
                 "last_updated": $last_updated
               }
             }')
 
-          # Save payload to file
           echo "$REGISTRATION_PAYLOAD" > registration_payload.json
-          PAYLOAD_COMPACT=$(jq -c . registration_payload.json)
-          echo 'payload<<EOF' >> $GITHUB_OUTPUT
-          echo "$PAYLOAD_COMPACT" >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "payload=$(echo "$REGISTRATION_PAYLOAD" | jq -c .)" >> $GITHUB_OUTPUT
 
           echo "Generated registration payload:"
-          cat registration_payload.json | jq '.'
+          cat registration_payload.json | jq .
 
       - name: Register with Bindu
         run: |
-          echo "Registering agent with Bindu directory..."
+          echo "Sending registration to Bindu..."
 
-          RESPONSE=$(curl --location 'https://bindus.getbindu.com/bindu-register' \
+          curl --location 'https://bindus.getbindu.com/bindu-register' \
             --header 'accept: application/json' \
             --header 'X-Bindu-CI: true' \
             --header "X-API-Token: ${{ secrets.BINDU_API_TOKEN }}" \
             --header 'Content-Type: application/json' \
-            --data-binary @registration_payload.json \
-            --write-out '%{http_code}' \
-            --silent \
-            --output response.json)
+            --data-binary @registration_payload.json
 
-          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 201 ]; then
-            echo "✅ Registration successful (HTTP $RESPONSE)"
-            cat response.json | jq '.'
-          else
-            echo "❌ Registration failed (HTTP $RESPONSE)"
-            cat response.json
-            exit 1
-          fi
-
-      - name: Upload registration payload as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: registration-payload
-          path: registration_payload.json
-          retention-days: 7
-
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          body: |
-            ## 🎉 Breakup Recovery Agent v${{ steps.version.outputs.version }}
-
-            ### What's New:
-            - Four specialized agents for comprehensive breakup recovery
-            - Vision analysis support for chat screenshots
-            - Multi-platform Docker images (amd64/arm64)
-
-            ### Docker Images:
-            - `${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:latest`
-            - `${{ secrets.DOCKERHUB_USERNAME }}/ai-breakup-recovery-agent:${{ steps.version.outputs.version }}`
-
-            ### Documentation:
-            - [GitHub Repository](https://github.com/${{ github.repository }})
-            - [Documentation](https://paraschamoli.github.io/ai-breakup-recovery-agent/)
-
-            ### Deployment:
-            The agent is now registered with the Bindu Directory and ready for use.
-          files: |
-            registration_payload.json
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo ""
+          echo "✅ Registration complete"
