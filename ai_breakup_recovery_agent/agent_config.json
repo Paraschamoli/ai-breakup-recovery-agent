@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "recreate_keys": false,
   "skills": [
-    "skills/breakup-recovery"
+    "skills/Breakup-Recovery"
   ],
   "capabilities": {},
   "agent_trust": "low",

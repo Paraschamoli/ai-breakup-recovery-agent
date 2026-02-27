@@ -69,10 +69,10 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
 
           # Read skill if exists
-          SKILL_PATH="ai_breakup_recovery_agent/skills/breakup-recovery/skill.yaml"
+          SKILL_PATH="ai_breakup_recovery_agent/skills/Breakup-Recovery/skill.yaml"
           if [ -f "$SKILL_PATH" ]; then
             echo "Reading skill from: $SKILL_PATH"
-            SKILL_JSON=$(yq -o=json "$SKILL_PATH")
+            SKILL_JSON=$(yq -o=json "$SKILL_PATH" | jq '.requirements = (.requirements.packages // [])')
             echo "skill=$SKILL_JSON" >> $GITHUB_OUTPUT
           else
             echo "skill={}" >> $GITHUB_OUTPUT
