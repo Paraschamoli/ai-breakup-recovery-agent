@@ -138,7 +138,10 @@ jobs:
 
           # Save payload to file
           echo "$REGISTRATION_PAYLOAD" > registration_payload.json
-          echo "payload=$(echo "$REGISTRATION_PAYLOAD" | jq -c .)" >> $GITHUB_OUTPUT
+          PAYLOAD_COMPACT=$(jq -c . registration_payload.json)
+          echo 'payload<<EOF' >> $GITHUB_OUTPUT
+          echo "$PAYLOAD_COMPACT" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
 
           echo "Generated registration payload:"
           cat registration_payload.json | jq '.'
