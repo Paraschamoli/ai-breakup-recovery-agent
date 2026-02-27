@@ -42,7 +42,7 @@ async def _run_agent_text(agent: Any, text: str) -> Any:
 # -------------------------
 # Config Loader
 # -------------------------
-def load_config() -> dict:
+def load_config() -> dict[str, Any]:
     """Load agent config from `agent_config.json` or return defaults."""
     possible_paths = [
         Path(__file__).parent.parent / "agent_config.json",
@@ -54,7 +54,7 @@ def load_config() -> dict:
         if config_path.exists():
             try:
                 with open(config_path) as f:
-                    return json.load(f)
+                    return cast(dict[str, Any], json.load(f))
             except (OSError, json.JSONDecodeError) as exc:
                 _logger.warning("Failed to load config from %s", config_path, exc_info=exc)
                 continue
